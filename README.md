@@ -36,7 +36,7 @@
    - 6.2 [Clocking Summary](#62-clocking-summary)  
    - 6.3 [Resource Utilization & Timing](#63-resource-utilization--timing)  
    - 6.4 [Schematic & Block Diagram](#64-schematic--block-diagram)  
-10. [License & Acknowledgments](#license--acknowledgments)  
+
 
 ---
 
@@ -307,5 +307,86 @@ leds[3:0] <------~ riscv5stage_core.leds // inverted inside core
 *LED Ring:* once `PC == DONE_PC`, the ring generator overrides MMIO writes with a 5 Hz rotating pattern (`1000 → 0100 → 0010 → 0001`).
 
 > With this integration the design boots from on-chip BRAM, executes user code, and exposes human-visible I/O for stand-alone demos – all without PS assistance.
+
+---
+
+4. Hardware Bring-Up on PYNQ-Z2
+
+4.1 Constraints & I/O Planning
+
+Pin assignment for system clock, reset, switches, and LEDs
+
+XDC file overview and key constraints configurations
+
+4.2 Bitstream Generation & Programming
+
+Vivado implementation and bitstream export steps
+
+Programming the PYNQ-Z2 via JTAG or SD card
+
+4.3 On-Board Verification with LEDs
+
+Reset behavior and initial LED state
+
+Observing LED ring behavior post-boot
+
+Troubleshooting steps with ila and debug cores if LEDs do not cycle as expected
+
+---
+5. Test & Debug
+
+5.1 Internal Logic Analyzer (Chipscope/ILA)
+
+Capturing key signals: program_done, tick_step, io_leds_reg, led_ring
+
+ILA core integration in the block design and hierarchy references
+
+Trigger configurations and waveform capture procedures
+
+5.2 Common Issues & Resolutions
+
+Multiple driver nets: resolved by enforcing single-driver write-back paths in MEM_WB
+
+Reset synchronization: mapping PS and PL resets to an external push button for deterministic hardware resets
+
+I/O standards & constraints: pitfalls on the PYNQ‑Z2 requiring explicit LOC and IOSTANDARD settings
+
+5.3 Lessons Learned
+
+Simulation vs. hardware: importance of ILA visibility to diagnose on-board behavior
+
+Memory initialization: nuances between .hex and .coe formats for BRAM initialization
+
+Prescaler design: choosing step periods for visible LED blinking rates on hardware
+
+---
+## 6. Final Hardware Report
+
+### 6.1 Power Consumption
+The on-chip power report shows a total of **1.689 W** (1.539 W dynamic, 0.151 W static), with PS7 (Zynq) consuming ~1.524 W (95%).  
+![Total On-Chip Power Summary](images/power_summary.png)
+
+### 6.2 Clocking Summary
+The Zynq PL fabric clock (FCLK_CLK0) was driven from the IO-PLL at 50 MHz.  
+![PL Fabric Clock Configuration](images/clock_config.png)
+
+### 6.3 Resource Utilization & Timing
+**Floorplan**  
+Resource placement across the four device quadrants illustrates BRAM clusters (upper left/right) and heavy logic utilization (bottom right).  
+![FPGA Floorplan](images/device_floorplan.png)
+
+**Timing Summary**  
+All user-specified constraints were met. Worst Negative Slack (WNS) = 6.866 ns, Worst Hold Slack (WHS) = 0.062 ns, Worst Pulse-Width Slack (WPWS) = 8.750 ns.  
+![Design Timing Summary](imges/timing_summary.png)
+
+### 6.4 Schematic & Block Diagram
+**Block Design**  
+Top-level Vivado block-design shows the Zynq PS, riscv5stage_core IP, and dual BRAM generators for IMEM/DMEM.  
+![Vivado Block Design](images/block_diagram.png)
+
+**Top-Level Schematic**  
+Flattened post-implementation netlist schematic with all I/O buffers and debug ILA connections.  
+![Top-Level Schematic](images/top_level_schematic.png)
+![Top-Level Schematic2](images/top_level_schematic2.png)
 
 
