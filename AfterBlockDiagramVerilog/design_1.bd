@@ -1,0 +1,425 @@
+{
+  "design": {
+    "design_info": {
+      "boundary_crc": "0x6729D219DE460415",
+      "device": "xc7z020clg400-1",
+      "gen_directory": "../../../../RiscV.gen/sources_1/bd/design_1",
+      "name": "design_1",
+      "rev_ctrl_bd_flag": "RevCtrlBdOff",
+      "synth_flow_mode": "Hierarchical",
+      "tool_version": "2025.1",
+      "validated": "true"
+    },
+    "design_tree": {
+      "processing_system7_0": "",
+      "imem_bram": "",
+      "dmem_bram": "",
+      "proc_sys_reset_0": "",
+      "riscv5stage_Core_0": ""
+    },
+    "interface_ports": {
+      "DDR": {
+        "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:ddrx:1.0",
+        "vlnv": "xilinx.com:interface:ddrx_rtl:1.0",
+        "parameters": {
+          "AXI_ARBITRATION_SCHEME": {
+            "value": "TDM",
+            "value_src": "default"
+          },
+          "BURST_LENGTH": {
+            "value": "8",
+            "value_src": "default"
+          },
+          "CAN_DEBUG": {
+            "value": "false",
+            "value_src": "default"
+          },
+          "CAS_LATENCY": {
+            "value": "11",
+            "value_src": "default"
+          },
+          "CAS_WRITE_LATENCY": {
+            "value": "11",
+            "value_src": "default"
+          },
+          "CS_ENABLED": {
+            "value": "true",
+            "value_src": "default"
+          },
+          "DATA_MASK_ENABLED": {
+            "value": "true",
+            "value_src": "default"
+          },
+          "DATA_WIDTH": {
+            "value": "8",
+            "value_src": "default"
+          },
+          "MEMORY_TYPE": {
+            "value": "COMPONENTS",
+            "value_src": "default"
+          },
+          "MEM_ADDR_MAP": {
+            "value": "ROW_COLUMN_BANK",
+            "value_src": "default"
+          },
+          "SLOT": {
+            "value": "Single",
+            "value_src": "default"
+          },
+          "TIMEPERIOD_PS": {
+            "value": "1250",
+            "value_src": "default"
+          }
+        },
+        "port_maps": {
+          "CAS_N": {
+            "physical_name": "DDR_cas_n",
+            "direction": "IO"
+          },
+          "CKE": {
+            "physical_name": "DDR_cke",
+            "direction": "IO"
+          },
+          "CK_N": {
+            "physical_name": "DDR_ck_n",
+            "direction": "IO"
+          },
+          "CK_P": {
+            "physical_name": "DDR_ck_p",
+            "direction": "IO"
+          },
+          "CS_N": {
+            "physical_name": "DDR_cs_n",
+            "direction": "IO"
+          },
+          "RESET_N": {
+            "physical_name": "DDR_reset_n",
+            "direction": "IO"
+          },
+          "ODT": {
+            "physical_name": "DDR_odt",
+            "direction": "IO"
+          },
+          "RAS_N": {
+            "physical_name": "DDR_ras_n",
+            "direction": "IO"
+          },
+          "WE_N": {
+            "physical_name": "DDR_we_n",
+            "direction": "IO"
+          },
+          "BA": {
+            "physical_name": "DDR_ba",
+            "direction": "IO",
+            "left": "2",
+            "right": "0"
+          },
+          "ADDR": {
+            "physical_name": "DDR_addr",
+            "direction": "IO",
+            "left": "14",
+            "right": "0"
+          },
+          "DM": {
+            "physical_name": "DDR_dm",
+            "direction": "IO",
+            "left": "3",
+            "right": "0"
+          },
+          "DQ": {
+            "physical_name": "DDR_dq",
+            "direction": "IO",
+            "left": "31",
+            "right": "0"
+          },
+          "DQS_N": {
+            "physical_name": "DDR_dqs_n",
+            "direction": "IO",
+            "left": "3",
+            "right": "0"
+          },
+          "DQS_P": {
+            "physical_name": "DDR_dqs_p",
+            "direction": "IO",
+            "left": "3",
+            "right": "0"
+          }
+        }
+      },
+      "FIXED_IO": {
+        "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:display_processing_system7:fixedio:1.0",
+        "vlnv": "xilinx.com:display_processing_system7:fixedio_rtl:1.0",
+        "parameters": {
+          "CAN_DEBUG": {
+            "value": "false",
+            "value_src": "default"
+          }
+        },
+        "port_maps": {
+          "MIO": {
+            "physical_name": "FIXED_IO_mio",
+            "direction": "IO",
+            "left": "53",
+            "right": "0"
+          },
+          "DDR_VRN": {
+            "physical_name": "FIXED_IO_ddr_vrn",
+            "direction": "IO"
+          },
+          "DDR_VRP": {
+            "physical_name": "FIXED_IO_ddr_vrp",
+            "direction": "IO"
+          },
+          "PS_SRSTB": {
+            "physical_name": "FIXED_IO_ps_srstb",
+            "direction": "IO"
+          },
+          "PS_CLK": {
+            "physical_name": "FIXED_IO_ps_clk",
+            "direction": "IO"
+          },
+          "PS_PORB": {
+            "physical_name": "FIXED_IO_ps_porb",
+            "direction": "IO"
+          }
+        }
+      }
+    },
+    "ports": {
+      "leds": {
+        "direction": "O",
+        "left": "3",
+        "right": "0"
+      },
+      "debug_led": {
+        "direction": "O"
+      },
+      "switches": {
+        "direction": "I",
+        "left": "3",
+        "right": "0"
+      },
+      "rst": {
+        "type": "rst",
+        "direction": "I",
+        "parameters": {
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "POLARITY": {
+            "value": "ACTIVE_LOW",
+            "value_src": "default"
+          }
+        }
+      }
+    },
+    "components": {
+      "processing_system7_0": {
+        "vlnv": "xilinx.com:ip:processing_system7:5.5",
+        "ip_revision": "7",
+        "xci_name": "design_1_processing_system7_0_0",
+        "xci_path": "ip\\design_1_processing_system7_0_0\\design_1_processing_system7_0_0.xci",
+        "inst_hier_path": "processing_system7_0",
+        "has_run_ip_tcl": "true",
+        "parameters": {
+          "PCW_FPGA_FCLK0_ENABLE": {
+            "value": "1"
+          },
+          "PCW_USE_M_AXI_GP0": {
+            "value": "0"
+          }
+        }
+      },
+      "imem_bram": {
+        "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
+        "ip_revision": "11",
+        "xci_name": "design_1_blk_mem_gen_0_0",
+        "xci_path": "ip\\design_1_blk_mem_gen_0_0\\design_1_blk_mem_gen_0_0.xci",
+        "inst_hier_path": "imem_bram",
+        "has_run_ip_tcl": "true",
+        "parameters": {
+          "Byte_Size": {
+            "value": "8"
+          },
+          "Coe_File": {
+            "value": "../../../../../../imem.coe"
+          },
+          "Load_Init_File": {
+            "value": "true"
+          },
+          "Use_Byte_Write_Enable": {
+            "value": "true"
+          },
+          "Write_Depth_A": {
+            "value": "1024"
+          },
+          "Write_Width_A": {
+            "value": "32"
+          },
+          "use_bram_block": {
+            "value": "Stand_Alone"
+          }
+        }
+      },
+      "dmem_bram": {
+        "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
+        "ip_revision": "11",
+        "xci_name": "design_1_blk_mem_gen_1_0",
+        "xci_path": "ip\\design_1_blk_mem_gen_1_0\\design_1_blk_mem_gen_1_0.xci",
+        "inst_hier_path": "dmem_bram",
+        "has_run_ip_tcl": "true",
+        "parameters": {
+          "Byte_Size": {
+            "value": "8"
+          },
+          "Use_Byte_Write_Enable": {
+            "value": "true"
+          },
+          "Write_Depth_A": {
+            "value": "1024"
+          },
+          "Write_Width_A": {
+            "value": "32"
+          },
+          "use_bram_block": {
+            "value": "Stand_Alone"
+          }
+        }
+      },
+      "proc_sys_reset_0": {
+        "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
+        "ip_revision": "17",
+        "xci_name": "design_1_proc_sys_reset_0_0",
+        "xci_path": "ip\\design_1_proc_sys_reset_0_0\\design_1_proc_sys_reset_0_0.xci",
+        "inst_hier_path": "proc_sys_reset_0",
+        "has_run_ip_tcl": "true"
+      },
+      "riscv5stage_Core_0": {
+        "vlnv": "xilinx.com:user:riscv5stage_Core:1.0",
+        "ip_revision": "2",
+        "xci_name": "design_1_riscv5stage_Core_0_0",
+        "xci_path": "ip\\design_1_riscv5stage_Core_0_0\\design_1_riscv5stage_Core_0_0.xci",
+        "inst_hier_path": "riscv5stage_Core_0",
+        "has_run_ip_tcl": "true"
+      }
+    },
+    "interface_nets": {
+      "processing_system7_0_DDR": {
+        "interface_ports": [
+          "DDR",
+          "processing_system7_0/DDR"
+        ]
+      },
+      "processing_system7_0_FIXED_IO": {
+        "interface_ports": [
+          "FIXED_IO",
+          "processing_system7_0/FIXED_IO"
+        ]
+      }
+    },
+    "nets": {
+      "dmem_bram_douta": {
+        "ports": [
+          "dmem_bram/douta",
+          "riscv5stage_Core_0/dmem_douta"
+        ]
+      },
+      "ext_reset_in_0_1": {
+        "ports": [
+          "rst",
+          "proc_sys_reset_0/ext_reset_in"
+        ]
+      },
+      "imem_bram_douta": {
+        "ports": [
+          "imem_bram/douta",
+          "riscv5stage_Core_0/imem_douta"
+        ]
+      },
+      "proc_sys_reset_0_peripheral_aresetn": {
+        "ports": [
+          "proc_sys_reset_0/peripheral_aresetn",
+          "riscv5stage_Core_0/rst"
+        ]
+      },
+      "processing_system7_0_FCLK_CLK0": {
+        "ports": [
+          "processing_system7_0/FCLK_CLK0",
+          "proc_sys_reset_0/slowest_sync_clk",
+          "dmem_bram/clka",
+          "imem_bram/clka",
+          "riscv5stage_Core_0/clk"
+        ]
+      },
+      "riscv5stage_Core_0_debug_led": {
+        "ports": [
+          "riscv5stage_Core_0/debug_led",
+          "debug_led"
+        ]
+      },
+      "riscv5stage_Core_0_dmem_addra": {
+        "ports": [
+          "riscv5stage_Core_0/dmem_addra",
+          "dmem_bram/addra"
+        ]
+      },
+      "riscv5stage_Core_0_dmem_dina": {
+        "ports": [
+          "riscv5stage_Core_0/dmem_dina",
+          "dmem_bram/dina"
+        ]
+      },
+      "riscv5stage_Core_0_dmem_ena": {
+        "ports": [
+          "riscv5stage_Core_0/dmem_ena",
+          "dmem_bram/ena"
+        ]
+      },
+      "riscv5stage_Core_0_dmem_wea": {
+        "ports": [
+          "riscv5stage_Core_0/dmem_wea",
+          "dmem_bram/wea"
+        ]
+      },
+      "riscv5stage_Core_0_imem_addra": {
+        "ports": [
+          "riscv5stage_Core_0/imem_addra",
+          "imem_bram/addra"
+        ]
+      },
+      "riscv5stage_Core_0_imem_dina": {
+        "ports": [
+          "riscv5stage_Core_0/imem_dina",
+          "imem_bram/dina"
+        ]
+      },
+      "riscv5stage_Core_0_imem_ena": {
+        "ports": [
+          "riscv5stage_Core_0/imem_ena",
+          "imem_bram/ena"
+        ]
+      },
+      "riscv5stage_Core_0_imem_wea": {
+        "ports": [
+          "riscv5stage_Core_0/imem_wea",
+          "imem_bram/wea"
+        ]
+      },
+      "riscv5stage_Core_0_leds": {
+        "ports": [
+          "riscv5stage_Core_0/leds",
+          "leds"
+        ]
+      },
+      "switches_1": {
+        "ports": [
+          "switches",
+          "riscv5stage_Core_0/switches"
+        ]
+      }
+    }
+  }
+}
