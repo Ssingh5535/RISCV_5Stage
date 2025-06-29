@@ -232,5 +232,79 @@ Key waveforms were inspected in GTK‑Wave / Vivado Sim:
 
 > **Take‑away:** RTL passed all self‑checks before moving to hardware, drastically cutting bring‑up time on the board.
 
-please put it inmarkdown code 
+---
+
+## 3. FPGA Integration (Block Diagram)
+
+The RTL core was migrated onto the **PYNQ-Z2** by means of a pure-IP Vivado block design, cleanly separating processing-system infrastructure from the custom RISC-V datapath.
+
+| BD Artifact | Location | Notes |
+|-------------|----------|-------|
+| `hw/design_1.bd` | Version-controlled TCL from Vivado **Write BD Tcl** | Self-contained; regenerates the block diagram. |
+| `hw/PYNQ-Z2_v1.0.xdc` | Board constraints | Clocks, push-button reset, 4 × switches, 4 × LEDs. |
+
+### 3.1 Zynq Processing System Reset & Clocking
+
+* **Clock (FCLK0)**  
+  * 125 MHz derived from PS PLL (**PS-PL Fabric Clock**).  
+  * Exported to the core as `clk` and to the ILA for synchronous probing.
+
+* **Reset (FCLK_RESET0_N)**  
+  * Active-low, sourced from PS **SRST** line.  
+  * OR-gated with an external push-button (`BTN0 → D19`) for manual re-arm.  
+  * Debounce done in fabric (`util_reduced_logic` plus sync FF).
+
+       +----------------------------+
+       |  Zynq PS (processing_system7) |
+       |                              |
+       |  FCLK0  ---> 125 MHz ----> fabric clk
+       |  RESETN ---> SRST/BTN0 ---> fabric rst
+       +----------------------------+
+
+*Timing:*  
+`create_clock -period 8.000 [get_ports clk]`  
+meets 125 MHz except for a single long path in the ILA (ignored with false-path constraint).
+
+### 3.2 Custom IP: `riscv5stage_core`
+
+| Parameter      | Value        | Description                              |
+|----------------|--------------|------------------------------------------|
+| `IMEM_ADDR_BITS` | 10 | 1 KiB instruction BRAM, word-addressed |
+| `DMEM_ADDR_BITS` | 10 | 1 KiB data BRAM, word-addressed        |
+| `DONE_PC`        | `0x00004100` | Magic PC that triggers LED spinner |
+
+* **AXI-Lite?** None – the core speaks *native BRAM* for minimal latency.  
+* **Packaging:** `ipx::package_project` captures HDL, XDC, and BD interface definitions; live under `hw/riscvcore/`.
+
+### 3.3 BRAM Generators for IMEM & DMEM
+
+| BRAM IP        | Width | Depth | Init File | Mode |
+|----------------|-------|-------|-----------|------|
+| `imem_bram`    | 32 b  | 1 k   | `imem.coe` | **ROM** (no we) |
+| `dmem_bram`    | 32 b  | 1 k   | `dmem.coe` | **True Dual-Port** |
+
+*Port A* of each BRAM is wired to the processor (`imem_*`, `dmem_*`).  
+*Port B* left open for future DMA / PS access.
+
+> **Note:** `.coe` files are rebuilt whenever `imem.hex` / `dmem.hex` change; the `scripts/hex2coe.py` target is a pre-synthesis hook in the Vivado run.
+
+### 3.4 Memory-Mapped Switches & LEDs
+
+Simple **MMIO** lives inside the core (not AXI GPIO):
+
+| Address | Width | Direction | Function        |
+|---------|-------|-----------|-----------------|
+| `0x10`  | 4 b   | RO        | On-board switches |
+| `0x14`  | 4 b   | WO/RO     | User LEDs (active-low) |
+
+Hardware‐level wiring:
+
+switches[3:0] ----> riscv5stage_core.switches
+leds[3:0] <------~ riscv5stage_core.leds // inverted inside core
+
+
+*LED Ring:* once `PC == DONE_PC`, the ring generator overrides MMIO writes with a 5 Hz rotating pattern (`1000 → 0100 → 0010 → 0001`).
+
+> With this integration the design boots from on-chip BRAM, executes user code, and exposes human-visible I/O for stand-alone demos – all without PS assistance.
+
 
