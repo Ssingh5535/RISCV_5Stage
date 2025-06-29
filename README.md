@@ -56,4 +56,27 @@ All stages are written in synthesizable Verilog, verified in ModelSim/Vivado sim
 ---
 
 ## Repository Layout
-
+/
+├── rtl/ # Verilog RTL source
+│ ├── IF_stage.v
+│ ├── IF_ID.v
+│ ├── ID_stage.v
+│ ├── ID_EX.v
+│ ├── EX_stage.v
+│ ├── EX_MEM.v
+│ ├── MEM_WB.v
+│ ├── forwarding_unit.v
+│ ├── hazard_unit.v
+│ └── riscv5stage_top.v
+├── tb/ # Testbenches and memory hex files
+│ ├── tb_riscv5stage.v
+│ ├── imem.hex
+│ └── dmem.hex
+├── scripts/ # COE conversion, simulation setup, etc.
+├── hw/ # Vivado block-design and constraints
+│ ├── design_1.bd
+│ ├── PYNQ-Z2_v1.0.xdc
+│ └── riscvcore/ # Packaged IP for riscv5stage_core
+├── docs/ # Schematics, timing reports, screenshots
+├── README.md # ← you are here
+└── LICENSE
