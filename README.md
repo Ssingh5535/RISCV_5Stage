@@ -299,9 +299,10 @@ Simple **MMIO** lives inside the core (not AXI GPIO):
 
 Hardware‐level wiring:
 
+```
 switches[3:0] ----> riscv5stage_core.switches
 leds[3:0] <------~ riscv5stage_core.leds // inverted inside core
-
+```
 
 *LED Ring:* once `PC == DONE_PC`, the ring generator overrides MMIO writes with a 5 Hz rotating pattern (`1000 → 0100 → 0010 → 0001`).
 
