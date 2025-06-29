@@ -310,21 +310,21 @@ leds[3:0] <------~ riscv5stage_core.leds // inverted inside core
 
 ---
 
-4. Hardware Bring-Up on PYNQ-Z2
+## 4. Hardware Bring-Up on PYNQ-Z2
 
-4.1 Constraints & I/O Planning
+### 4.1 Constraints & I/O Planning
 
 Pin assignment for system clock, reset, switches, and LEDs
 
 XDC file overview and key constraints configurations
 
-4.2 Bitstream Generation & Programming
+### 4.2 Bitstream Generation & Programming
 
 Vivado implementation and bitstream export steps
 
 Programming the PYNQ-Z2 via JTAG or SD card
 
-4.3 On-Board Verification with LEDs
+### 4.3 On-Board Verification with LEDs
 
 Reset behavior and initial LED state
 
@@ -333,9 +333,9 @@ Observing LED ring behavior post-boot
 Troubleshooting steps with ila and debug cores if LEDs do not cycle as expected
 
 ---
-5. Test & Debug
+## 5. Test & Debug
 
-5.1 Internal Logic Analyzer (Chipscope/ILA)
+### 5.1 Internal Logic Analyzer (Chipscope/ILA)
 
 Capturing key signals: program_done, tick_step, io_leds_reg, led_ring
 
@@ -343,7 +343,7 @@ ILA core integration in the block design and hierarchy references
 
 Trigger configurations and waveform capture procedures
 
-5.2 Common Issues & Resolutions
+### 5.2 Common Issues & Resolutions
 
 Multiple driver nets: resolved by enforcing single-driver write-back paths in MEM_WB
 
@@ -351,7 +351,7 @@ Reset synchronization: mapping PS and PL resets to an external push button for d
 
 I/O standards & constraints: pitfalls on the PYNQ‑Z2 requiring explicit LOC and IOSTANDARD settings
 
-5.3 Lessons Learned
+### 5.3 Lessons Learned
 
 Simulation vs. hardware: importance of ILA visibility to diagnose on-board behavior
 
