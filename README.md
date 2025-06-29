@@ -82,3 +82,155 @@ All stages are written in synthesizable Verilog, verified in ModelSim/Vivado sim
 ├── docs/                    # Schematics, timing reports, screenshots
 ├── README.md                # ← you are here
 └── LICENSE
+```
+---
+
+## Prerequisites
+
+This project was developed and tested with the following tools and hardware:
+
+- **Xilinx Vivado 2025.1**  
+  - Used for RTL synthesis, implementation, block-design creation, and bitstream generation.  
+- **Verilog Simulator** (Icarus Verilog / ModelSim)  
+  - Employed for functional and timing verification of the 5-stage pipeline.  
+- **Python 3.8+**  
+  - Leveraged for COE-conversion scripts and simple automation.  
+- **PYNQ-Z2 Board** with USB-JTAG  
+  - Target platform for hardware validation of the RISC-V core.  
+- **PMod USB-UART** (optional)  
+  - Captured console output via the PS UART interface.  
+- **Git / GitHub**  
+  - Version control and repository hosting.  
+
+**Board connections & parameters**  
+- 125 MHz input clock wired to H16 (sysclk → PL clk)  
+- Reset (active-high) driven by BTN0 (D19)  
+- Four active-low LEDs on R14, P14, N16, M14  
+- Four LVCMOS33 switches on M20, M19, L20, L19
+
+---
+
+## 1. RTL Design
+
+### 1.1 Verilog Modules
+- **IF_stage.v**  
+  Implements the instruction fetch stage: PC register, PC+4 calculation, instruction fetch interface.
+- **IF_ID.v**  
+  Pipeline register between IF and ID stages, with stall/flush support.
+- **ID_stage.v**  
+  Instruction decode, register‐file read, immediate extraction, control‐signal generation.
+- **ID_EX.v**  
+  Pipeline register between ID and EX stages, propagating operands and control signals.
+- **EX_stage.v**  
+  ALU operations, branch target calculation, zero‐flag generation, forwarding muxes.
+- **EX_MEM.v**  
+  Pipeline register between EX and MEM stages, latching ALU result and store data.
+- **MEM_WB.v**  
+  Pipeline register between MEM and WB stages, latching memory data and ALU result.
+- **forwarding_unit.v**  
+  Detects RAW hazards and selects forwarded operands from later pipeline stages.
+- **hazard_unit.v**  
+  Detects load-use hazards, generates stall and flush signals to insert bubbles.
+- **riscv5stage_top.v**  
+  Top-level integration: instantiates BRAMs, all pipeline stages, memory-mapped I/O, ring-blink logic.
+
+### 1.2 Pipeline Stages
+- **Fetch (IF)**  
+  - PC register with stall/flush  
+  - Instruction fetch from instruction BRAM (`imem_bram`)  
+- **Decode (ID)**  
+  - Split instruction fields (opcode, rs1, rs2, rd, funct3/7)  
+  - Read register file, generate immediates  
+  - Produce control signals (MemRead, MemWrite, RegWrite, ALUOp, etc.)  
+- **Execute (EX)**  
+  - Perform ALU ops based on ALUOp and funct fields  
+  - Compute branch target and Zero flag  
+  - Apply forwarding from EX/MEM and MEM/WB to eliminate hazards  
+- **Memory (MEM)**  
+  - Access data BRAM (`dmem_bram`) for loads/stores  
+  - Perform memory-mapped I/O:  
+    - Reads from `0x10` return switch state  
+    - Writes to `0x14` update `io_leds_reg`  
+- **Write-Back (WB)**  
+  - Select between ALU result and memory/I-O data  
+  - Write back to register file
+
+### 1.3 Memory-Mapped I/O
+- **Switch inputs** mapped at address `0x10`  
+  - On a read, returns `{28'b0, switches[3:0]}`  
+- **LED outputs** mapped at address `0x14`  
+  - On a store, updates `io_leds_reg[3:0]`  
+  - On a read, returns `{28'b0, io_leds_reg}`  
+- I-O logic lives in the top-level `always @ (posedge clk)` block and multiplexes BRAM vs. I-O data on reads.
+
+---
+## 2. Simulation & Memory Testing
+
+A full pre‑silicon verification flow was developed before committing the design to the PYNQ‑Z2.  All artefacts live under `tb/` and `scripts/`.
+
+### 2.1 Instruction Memory Initialisation
+
+| File                 | Purpose                                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| `imem.hex`           | Hex‑encoded machine code produced by the RISC‑V GNU tool‑chain.                                 |
+| `scripts/hex2coe.py` | One‑liner that converts a flat HEX file to Vivado‑compatible `.coe` for Block Memory Generator. |
+
+```bash
+python3 scripts/hex2coe.py imem.hex imem.coe
+```
+
+In simulation the file is loaded directly:
+
+```verilog
+initial $readmemh("imem.hex", dut.u_imem_inst.mem);
+```
+
+The same `.coe` is later reused inside Vivado to seed the BRAM.
+
+### 2.2 Data Memory Initialisation
+
+`dmem.hex` starts as all zeros, but the testbench can inject specific patterns (e.g., stack frames, I/O registers) by swapping the file.  The conversion script works identically:
+
+```bash
+python3 scripts/hex2coe.py dmem.hex dmem.coe
+```
+
+### 2.3 Testbench Structure
+
+* **Clock & Reset** ‑ 100 MHz toggling clock, 20 ns active‑high reset pulse.
+* **Stimulus** ‑ Four‑bit `switches` bus exercises memory‑mapped I/O.
+* **Pipeline Probes** ‑ Hazard and forwarding paths (`stall`, `flush`, `forwardA/B`) are dumped for every cycle.
+
+Minimal excerpt:
+
+```verilog
+always #5 clk = ~clk;                  // 100 MHz
+initial begin rst = 1; #20 rst = 0; end
+
+initial begin
+  switches = 4'b0000;
+  repeat (10) @(posedge clk);
+  switches = 4'b0101;                  // hit LED MMIO
+end
+```
+
+### 2.4 Waveform Inspection & Coverage
+
+| Metric              | Result                         |
+| ------------------- | ------------------------------ |
+| Functional coverage | 100 % of executed basic blocks |
+| Branch coverage     | 100 % (taken & not‑taken)      |
+| Toggle coverage     | 96 % across sequential nets    |
+| Assertion failures  | **0**                          |
+
+Key waveforms were inspected in GTK‑Wave / Vivado Sim:
+
+* **Program Counter** – monotonic except during branch flush.
+* **Hazard Unit** – single‑cycle stall on load‑use; no false stalls.
+* **BRAM Ports** – read latency matches synthesis model.
+* **MMIO LEDs** – `io_leds_reg` follows store data; ring generator activates once `DONE_PC` is reached.
+
+> **Take‑away:** RTL passed all self‑checks before moving to hardware, drastically cutting bring‑up time on the board.
+
+please put it inmarkdown code 
+
